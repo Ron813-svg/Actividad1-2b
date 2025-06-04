@@ -12,9 +12,9 @@ const useFetch = () => {
     }
   };
 
-  const handlePut = async (idLibros, autor, libro, estado, genero) => {
+  const handlePut = async (id, autor, libro, estado, genero) => {
     try {
-      const response = await fetch(`${apiUrl}/${idLibros}`, {
+      const response = await fetch(`${apiUrl}/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -33,7 +33,7 @@ const useFetch = () => {
     }
   };
 
-  const handlePost = async (idLibros, autor, libro, estado, genero) => {
+  const handlePost = async (id, autor, libro, estado, genero) => {
     try {
       const response = await fetch(`${apiUrl}`, {
         method: "POST",
@@ -41,7 +41,7 @@ const useFetch = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          idLibros,
+          id,
           autor,
           libro,
           estado,
@@ -55,9 +55,9 @@ const useFetch = () => {
     }
   };
 
-  const handleDelete = async (idLibros) => {
+  const handleDelete = async (id) => {
     try {
-      const response = await fetch(`${apiUrl}/${idLibros}`, {
+      const response = await fetch(`${apiUrl}/${id}`, {
         method: "DELETE",
       });
       return response.ok; // Retorna true si la operación fue exitosa

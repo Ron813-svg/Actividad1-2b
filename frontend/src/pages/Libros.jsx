@@ -138,7 +138,7 @@ const Libros = () => {
                 </button>
                 <button
                   className="btn btn-danger"
-                  onClick={() => handleDeleteBook(libro.idLibros)}
+                 onClick={() => handleDelete(libro.id)}
                 >
                   Eliminar
                 </button>
