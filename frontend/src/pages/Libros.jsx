@@ -119,8 +119,8 @@ const Libros = () => {
           </tr>
         </thead>
         <tbody>
-          {libros.map((libro) => (
-            <tr key={libro.idLibros}>
+          {libros.map((libro, idx) => (
+            <tr key={libro.idLibros ?? idx}>
               <td>{libro.idLibros}</td>
               <td>{libro.autor}</td>
               <td>{libro.libro}</td>
