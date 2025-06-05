@@ -3,7 +3,9 @@ import { apiUrl } from "../api/ApiRestUrl.js";
 const useFetch = () => {
   const fetchData = async () => {
     try {
-      const response = await fetch(`${apiUrl}`);
+      const response = await fetch(`${apiUrl}`, {
+        credentials: "include", 
+      });
       const data = await response.json();
       return data; // Retorna los datos obtenidos
     } catch (error) {
@@ -19,6 +21,7 @@ const useFetch = () => {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include", // Se agrega credentials: "include"
         body: JSON.stringify({
           autor,
           libro,
@@ -40,6 +43,7 @@ const useFetch = () => {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include", // Se agrega credentials: "include"
         body: JSON.stringify({
           id,
           autor,
@@ -59,6 +63,7 @@ const useFetch = () => {
     try {
       const response = await fetch(`${apiUrl}/${id}`, {
         method: "DELETE",
+        credentials: "include", // Se agrega credentials: "include"
       });
       return response.ok; // Retorna true si la operación fue exitosa
     } catch (error) {

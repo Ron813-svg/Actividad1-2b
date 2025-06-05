@@ -17,39 +17,48 @@ const Libros = () => {
     loadBooks();
   }, [fetchData]);
 
-  // Manejar el envío del formulario para agregar o actualizar un libro
-  const onSubmit = async (data) => {
-    if (idLibros) {
-      // Actualizar libro
-      const success = await handlePostUpdate(
-        idLibros,
-        data.autor,
-        data.libro,
-        data.estado,
-        data.genero
-      );
-      if (success) {
-        alert("Libro actualizado correctamente");
-        reset();
-        setIdLibros("");
-        const updatedBooks = await fetchData();
-        setLibros(updatedBooks || []);
-      }
-    } else {
-      // Agregar nuevo libro
-      const success = await handlePostUpdate(
-        null,
-        data.autor,
-        data.libro,
-        data.estado,
-        data.genero
-      );
-      if (success) {
-        alert("Libro agregado correctamente");
-        reset();
-        const updatedBooks = await fetchData();
-        setLibros(updatedBooks || []);
-      }
+  // Manejar el envío del formulario para agregar un libro
+  const onAdd = async (data) => {
+    const success = await handlePost(
+      null,
+      data.autor,
+      data.libro,
+      data.estado,
+      data.genero
+    );
+    if (success) {
+      alert("Libro agregado correctamente");
+      reset();
+      const updatedBooks = await fetchData();
+      setLibros(updatedBooks || []);
+    }
+  };
+
+  // Manejar el envío del formulario para actualizar un libro
+  const onUpdate = async (data) => {
+    if (!idLibros) {
+      alert("Selecciona un libro para actualizar");
+      return;
+    }
+    const success = await handlePut(
+      idLibros,
+      data.autor,
+      data.libro,
+      data.estado,
+      data.genero
+    );
+    if (success) {
+      alert("Libro actualizado correctamente");
+      reset();
+      setIdLibros("");
+      reset({               // Limpia los campos del formulario
+        autor: "",
+        libro: "",
+        estado: "",
+        genero: "",
+      });
+      const updatedBooks = await fetchData();
+      setLibros(updatedBooks || []);
     }
   };
 
@@ -68,7 +77,7 @@ const Libros = () => {
       <h1>Gestión de Libros</h1>
 
       {/* Formulario para agregar o actualizar libros */}
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form>
         <div className="mb-3">
           <label className="form-label">Autor</label>
           <input
@@ -101,9 +110,34 @@ const Libros = () => {
             {...register("genero", { required: true })}
           />
         </div>
-        <button type="submit" className="btn btn-primary">
-          {idLibros ? "Actualizar Libro" : "Agregar Libro"}
+        <button
+          type="button"
+          className="btn btn-primary me-2"
+          onClick={handleSubmit(onAdd)}
+          disabled={idLibros !== ""}
+        >
+          Agregar Libro
         </button>
+        <button
+          type="button"
+          className="btn btn-success"
+          onClick={handleSubmit(onUpdate)}
+          disabled={idLibros === ""}
+        >
+          Actualizar Libro
+        </button>
+        {idLibros && (
+          <button
+            type="button"
+            className="btn btn-secondary ms-2"
+            onClick={() => {
+              reset();
+              setIdLibros("");
+            }}
+          >
+            Cancelar edición
+          </button>
+        )}
       </form>
 
       {/* Tabla para mostrar los libros */}
@@ -120,8 +154,8 @@ const Libros = () => {
         </thead>
         <tbody>
           {libros.map((libro, idx) => (
-            <tr key={libro.idLibros ?? idx}>
-              <td>{libro.idLibros}</td>
+            <tr key={libro.id ?? idx}>
+              <td>{libro.id}</td>
               <td>{libro.autor}</td>
               <td>{libro.libro}</td>
               <td>{libro.estado}</td>
@@ -130,15 +164,20 @@ const Libros = () => {
                 <button
                   className="btn btn-warning me-2"
                   onClick={() => {
-                    setIdLibros(libro.idLibros);
-                    reset(libro); // Carga los datos en el formulario
+                    setIdLibros(libro.id); // Usa siempre libro.id
+                    reset({
+                      autor: libro.autor,
+                      libro: libro.libro,
+                      estado: libro.estado,
+                      genero: libro.genero,
+                    });
                   }}
                 >
                   Editar
                 </button>
                 <button
                   className="btn btn-danger"
-                 onClick={() => handleDelete(libro.id)}
+                  onClick={() => handleDeleteBook(libro.id)}
                 >
                   Eliminar
                 </button>
