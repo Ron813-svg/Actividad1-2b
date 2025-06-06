@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import useFetchBooks from "../hooks/useFetchBooks";
 import useFetch from "../hooks/useFetch";
+import { toast } from "react-hot-toast";
+import LibroInput from "../components/LibroInput";
+import LibroFormButtons from "../components/LibroFormButtons";
 
 const Libros = () => {
   const { register, handleSubmit, reset } = useForm();
@@ -24,16 +27,18 @@ const Libros = () => {
       data.genero
     );
     if (success) {
-      alert("Libro agregado correctamente");
+      toast.success("Libro agregado correctamente");
       reset();
       await getBooks();
+    } else {
+      toast.error("Error al agregar el libro");
     }
   };
 
   // Actualizar libro
   const onUpdate = async (data) => {
     if (!idLibros) {
-      alert("Selecciona un libro para actualizar");
+      toast.error("Selecciona un libro para actualizar");
       return;
     }
     const success = await handlePut(
@@ -44,7 +49,7 @@ const Libros = () => {
       data.genero
     );
     if (success) {
-      alert("Libro actualizado correctamente");
+      toast.success("Libro actualizado correctamente");
       setIdLibros("");
       reset({
         autor: "",
@@ -53,6 +58,8 @@ const Libros = () => {
         genero: "",
       });
       await getBooks();
+    } else {
+      toast.error("Error al actualizar el libro");
     }
   };
 
@@ -60,75 +67,38 @@ const Libros = () => {
   const handleDeleteBook = async (id) => {
     const success = await handleDelete(id);
     if (success) {
-      alert("Libro eliminado correctamente");
+      toast.success("Libro eliminado correctamente");
       await getBooks();
+    } else {
+      toast.error("Error al eliminar el libro");
     }
   };
+
+  // Mensaje de error al cargar libros
+  useEffect(() => {
+    if (!Array.isArray(dataBooks)) {
+      toast.error("Error al cargar los libros");
+    }
+  }, [dataBooks]);
 
   return (
     <div className="container mt-5">
       <h1>Gestión de Libros</h1>
       <form>
-        <div className="mb-3">
-          <label className="form-label">Autor</label>
-          <input
-            type="text"
-            className="form-control"
-            {...register("autor", { required: true })}
-          />
-        </div>
-        <div className="mb-3">
-          <label className="form-label">Libro</label>
-          <input
-            type="text"
-            className="form-control"
-            {...register("libro", { required: true })}
-          />
-        </div>
-        <div className="mb-3">
-          <label className="form-label">Estado</label>
-          <input
-            type="text"
-            className="form-control"
-            {...register("estado", { required: true })}
-          />
-        </div>
-        <div className="mb-3">
-          <label className="form-label">Género</label>
-          <input
-            type="text"
-            className="form-control"
-            {...register("genero", { required: true })}
-          />
-        </div>
-        <button
-          type="button"
-          className="btn btn-primary me-2"
-          onClick={handleSubmit(onAdd)}
-          disabled={idLibros !== ""}
-        >
-          Agregar Libro
-        </button>
-        <button
-          type="button"
-          className="btn btn-success"
-          onClick={handleSubmit(onUpdate)}
-          disabled={idLibros === ""}
-        >
-          Actualizar Libro
-        </button>
-        {idLibros && (
-          <button
-            type="button"
-            className="btn btn-secondary ms-2"
-            onClick={() => {
-              reset();
-              setIdLibros("");
-            }}
-          >
-            Cancelar edición
-          </button>
-        )}
+        <LibroInput label="Autor" name="autor" register={register} />
+        <LibroInput label="Libro" name="libro" register={register} />
+        <LibroInput label="Estado" name="estado" register={register} />
+        <LibroInput label="Género" name="genero" register={register} />
+        <LibroFormButtons
+          onAdd={onAdd}
+          onUpdate={onUpdate}
+          onCancel={() => {
+            reset();
+            setIdLibros("");
+          }}
+          isEditing={idLibros !== ""}
+          handleSubmit={handleSubmit}
+        />
       </form>
       <table className="table mt-5">
         <thead>
@@ -142,37 +112,38 @@ const Libros = () => {
           </tr>
         </thead>
         <tbody>
-          {dataBooks.map((libro, idx) => (
-            <tr key={libro.id ?? idx}>
-              <td>{libro.id}</td>
-              <td>{libro.autor}</td>
-              <td>{libro.libro}</td>
-              <td>{libro.estado}</td>
-              <td>{libro.genero}</td>
-              <td>
-                <button
-                  className="btn btn-warning me-2"
-                  onClick={() => {
-                    setIdLibros(libro.id);
-                    reset({
-                      autor: libro.autor,
-                      libro: libro.libro,
-                      estado: libro.estado,
-                      genero: libro.genero,
-                    });
-                  }}
-                >
-                  Editar
-                </button>
-                <button
-                  className="btn btn-danger"
-                  onClick={() => handleDeleteBook(libro.id)}
-                >
-                  Eliminar
-                </button>
-              </td>
-            </tr>
-          ))}
+          {Array.isArray(dataBooks) &&
+            dataBooks.map((libro, idx) => (
+              <tr key={libro.id ?? idx}>
+                <td>{libro.id}</td>
+                <td>{libro.autor}</td>
+                <td>{libro.libro}</td>
+                <td>{libro.estado}</td>
+                <td>{libro.genero}</td>
+                <td>
+                  <button
+                    className="btn btn-warning me-2"
+                    onClick={() => {
+                      setIdLibros(libro.id);
+                      reset({
+                        autor: libro.autor,
+                        libro: libro.libro,
+                        estado: libro.estado,
+                        genero: libro.genero,
+                      });
+                    }}
+                  >
+                    Editar
+                  </button>
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => handleDeleteBook(libro.id)}
+                  >
+                    Eliminar
+                  </button>
+                </td>
+              </tr>
+            ))}
         </tbody>
       </table>
     </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { Toaster } from "react-hot-toast";
 import Nav from './components/Nav.jsx';
 
 import Inicio from './pages/Inicio.jsx';
@@ -38,6 +39,7 @@ function AppContent() {
 function App() {
   return (
     <Router>
+      <Toaster position="top-right" reverseOrder={false} />
       <AppContent />
     </Router>
   );
