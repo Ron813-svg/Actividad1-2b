@@ -4,12 +4,13 @@ import Nav from './components/Nav.jsx';
 
 import Inicio from './pages/Inicio.jsx';
 import Libros from './pages/Libros.jsx';
+import Carga from './pages/PantallaCarga.jsx';
 
 
 function AppContent() {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(true);
-  const authRoutes = ['/login', '/register'];
+  const authRoutes = ['/carga'];
 
   useEffect(() => {
     const currentPath = location.pathname.toLowerCase().replace(/\/$/, '');
@@ -22,8 +23,8 @@ function AppContent() {
       {isOpen && <Nav />}
       <div className="container">
         <Routes>
-          <Route path="/" element={<Navigate to="/inicio" replace />} />
-          
+          <Route path="/" element={<Navigate to="/carga" replace />} />
+          <Route path="/carga" element={<Carga />} />
           <Route path="/inicio" element={<Inicio />} />
           <Route path="/libros" element={<Libros/>} />
           

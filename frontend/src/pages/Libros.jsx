@@ -1,23 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import useFetchBooks from "../hooks/useFetchBooks";
 import useFetch from "../hooks/useFetch";
 
 const Libros = () => {
-  const { fetchData, handlePost, handlePut, handleDelete } = useFetch(); // Importa las funciones desde useFetch.js
-  const { register, handleSubmit, reset } = useForm(); // react-hook-form para manejar el formulario
-  const [libros, setLibros] = useState([]); // Estado para almacenar los libros
-  const [idLibros, setIdLibros] = useState(""); // Estado para manejar el ID del libro seleccionado
+  const { register, handleSubmit, reset } = useForm();
+  const { dataBooks, setDataBooks, getBooks } = useFetchBooks();
+  const { handlePost, handlePut, handleDelete } = useFetch();
+  const [idLibros, setIdLibros] = useState("");
 
-  // Cargar datos al montar el componente
+  // Sincroniza los libros locales con los del hook
   useEffect(() => {
-    const loadBooks = async () => {
-      const data = await fetchData();
-      setLibros(data || []);
-    };
-    loadBooks();
-  }, [fetchData]);
+    setDataBooks(dataBooks || []);
+  }, [dataBooks, setDataBooks]);
 
-  // Manejar el envío del formulario para agregar un libro
+  // Agregar libro
   const onAdd = async (data) => {
     const success = await handlePost(
       null,
@@ -29,12 +26,11 @@ const Libros = () => {
     if (success) {
       alert("Libro agregado correctamente");
       reset();
-      const updatedBooks = await fetchData();
-      setLibros(updatedBooks || []);
+      await getBooks();
     }
   };
 
-  // Manejar el envío del formulario para actualizar un libro
+  // Actualizar libro
   const onUpdate = async (data) => {
     if (!idLibros) {
       alert("Selecciona un libro para actualizar");
@@ -49,34 +45,29 @@ const Libros = () => {
     );
     if (success) {
       alert("Libro actualizado correctamente");
-      reset();
       setIdLibros("");
-      reset({               // Limpia los campos del formulario
+      reset({
         autor: "",
         libro: "",
         estado: "",
         genero: "",
       });
-      const updatedBooks = await fetchData();
-      setLibros(updatedBooks || []);
+      await getBooks();
     }
   };
 
-  // Manejar eliminación de un libro
+  // Eliminar libro
   const handleDeleteBook = async (id) => {
     const success = await handleDelete(id);
     if (success) {
       alert("Libro eliminado correctamente");
-      const updatedBooks = await fetchData();
-      setLibros(updatedBooks || []);
+      await getBooks();
     }
   };
 
   return (
     <div className="container mt-5">
       <h1>Gestión de Libros</h1>
-
-      {/* Formulario para agregar o actualizar libros */}
       <form>
         <div className="mb-3">
           <label className="form-label">Autor</label>
@@ -139,8 +130,6 @@ const Libros = () => {
           </button>
         )}
       </form>
-
-      {/* Tabla para mostrar los libros */}
       <table className="table mt-5">
         <thead>
           <tr>
@@ -153,7 +142,7 @@ const Libros = () => {
           </tr>
         </thead>
         <tbody>
-          {libros.map((libro, idx) => (
+          {dataBooks.map((libro, idx) => (
             <tr key={libro.id ?? idx}>
               <td>{libro.id}</td>
               <td>{libro.autor}</td>
@@ -164,7 +153,7 @@ const Libros = () => {
                 <button
                   className="btn btn-warning me-2"
                   onClick={() => {
-                    setIdLibros(libro.id); // Usa siempre libro.id
+                    setIdLibros(libro.id);
                     reset({
                       autor: libro.autor,
                       libro: libro.libro,

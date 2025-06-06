@@ -1,18 +1,6 @@
 import { apiUrl } from "../api/ApiRestUrl.js";
 
 const useFetch = () => {
-  const fetchData = async () => {
-    try {
-      const response = await fetch(`${apiUrl}`, {
-        credentials: "include", 
-      });
-      const data = await response.json();
-      return data; // Retorna los datos obtenidos
-    } catch (error) {
-      console.error("Error al obtener los datos: ", error);
-      return null;
-    }
-  };
 
   const handlePut = async (id, autor, libro, estado, genero) => {
     try {
@@ -73,7 +61,6 @@ const useFetch = () => {
   };
 
   return {
-    fetchData,
     handlePost,
     handlePut,
     handleDelete,
