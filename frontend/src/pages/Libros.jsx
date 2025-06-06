@@ -93,7 +93,12 @@ const Libros = () => {
           onAdd={onAdd}
           onUpdate={onUpdate}
           onCancel={() => {
-            reset();
+            reset({
+              autor: "",
+              libro: "",
+              estado: "",
+              genero: "",
+            });
             setIdLibros("");
           }}
           isEditing={idLibros !== ""}
